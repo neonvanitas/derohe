@@ -339,29 +339,38 @@ func (chain *Blockchain) Create_new_miner_block(miner_address rpc.Address) (cbl 
 	}
 
 	if mbls := chain.MiniBlocks.GetAllMiniBlocks(key); len(mbls) > 0 {
+		fmt.Printf("building block template from minis\n")
 		my_blocks := globals.My_Blocks
 		selected := []block.MiniBlock{}
 		not_selected := []block.MiniBlock{}
 		for _, mbl := range mbls {
-			match := true
-			for idx, key_byte := range mbl.KeyHash {
-				for _, myblock := range my_blocks {
-					if myblock.KeyHash[idx] != key_byte {
-						match = false
-						break
-					}
-				}
-				if match {
-					selected = append(selected, mbl)
-				} else {
-					not_selected = append(not_selected, mbl)
+			match := false
+			for _, myblock := range my_blocks {
+				compared := bytes.Compare(myblock.KeyHash[:16], mbl.KeyHash[:16])
+				if compared == 0 {
+					match = true
+					break
 				}
 			}
+			if match {
+				//fmt.Printf("found my own mini\n")
+				selected = append(selected, mbl)
+			} else {
+				not_selected = append(not_selected, mbl)
+			}
 		}
-		missing := 9 - len(selected)
-		if missing > 0 {
+		found := len(selected)
+		//if we find more than 9, it should be negative and condition missed heh
+		missing := 9 - found
+
+		if missing > 0 && len(not_selected) >= missing {
 			selected = append(selected, not_selected[:missing]...)
 		}
+		//cap it if we have more than 9 own blocks etc
+		if len(selected) >= 9 {
+			selected = selected[:9]
+		}
+		fmt.Printf("found minis vs not found minis %d vs %d vs %d\n", found, missing, len(selected))
 		mbls = selected
 		//		if uint64(len(mbls)) > config.BLOCK_TIME-config.MINIBLOCK_HIGHDIFF {
 		//			//this picks the 9 miniblocks?
@@ -527,10 +536,8 @@ func (chain *Blockchain) Accept_new_block(tstamp uint64, miniblock_blob []byte) 
 		}
 
 		if err1, ok := chain.InsertMiniBlock(mbl); ok {
-			if globals.My_Blocks_Height != chain.Get_Height() {
-				globals.My_Blocks = []block.MiniBlock{}
-				globals.My_Blocks_Height = chain.Get_Height()
-			}
+			fmt.Printf("inserting miniblock at: %d, %d\n", chain.Get_Height(), globals.My_Blocks_Height)
+			fmt.Printf("appending to own miniblock store\n")
 			globals.My_Blocks = append(globals.My_Blocks, mbl)
 			result = true
 

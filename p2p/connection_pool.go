@@ -527,6 +527,11 @@ func Write_Broadcasts_To_File(filename string, chain_height int64, peer_id uint6
 }
 
 func Write_Latencies(filename string, connections []*Connection) {
+	if globals.My_Blocks_Height != chain.Get_Height() {
+		fmt.Printf("switching miniblock store to new array\n")
+		globals.My_Blocks = []block.MiniBlock{}
+		globals.My_Blocks_Height = chain.Get_Height()
+	}
 	if globals.Latency_Height >= chain.Get_Height() {
 		return
 	}
