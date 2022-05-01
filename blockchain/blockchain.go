@@ -1101,12 +1101,14 @@ func (chain *Blockchain) Add_Complete_Block(cbl *block.Complete_Block) (err erro
 	hash, err := chain.Load_Block_Topological_order_at_index(int64(chain.Get_Stable_Height()))
 	oldBlock, err := chain.Load_BL_FROM_ID(hash)
 
-	purged_key_count, purged_mini_count, lost_mini_count, lost_minis := chain.MiniBlocks.PurgeHeight(oldBlock.MiniBlocks, chain.Get_Stable_Height()) // purge all miniblocks upto this height
-	logger.V(2).Info("Purged miniblock", "count", purged_key_count)
-	chain.Write_Purge_Count(chain.Get_Height(), chain.Get_Stable_Height(), purged_key_count, purged_mini_count, chain.MiniBlocks.Count(), lost_mini_count)
-	chain.Write_Lost_Mini(chain.Get_Height(), lost_minis)
-	chain.Write_Block_Minis(bl)
-	//	chain.Write_Mini_Blocks(chain.Get_Height(), chain.MiniBlocks)
+	if chain.Get_Height() > 0 {
+		purged_key_count, purged_mini_count, lost_mini_count, lost_minis := chain.MiniBlocks.PurgeHeight(oldBlock.MiniBlocks, chain.Get_Stable_Height()) // purge all miniblocks upto this height
+		logger.V(2).Info("Purged miniblock", "count", purged_key_count)
+		chain.Write_Purge_Count(chain.Get_Height(), chain.Get_Stable_Height(), purged_key_count, purged_mini_count, chain.MiniBlocks.Count(), lost_mini_count)
+		chain.Write_Lost_Mini(chain.Get_Height(), lost_minis)
+		chain.Write_Block_Minis(bl)
+		//	chain.Write_Mini_Blocks(chain.Get_Height(), chain.MiniBlocks)
+	}
 
 	result = true
 
