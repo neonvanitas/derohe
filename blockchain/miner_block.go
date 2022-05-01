@@ -339,11 +339,34 @@ func (chain *Blockchain) Create_new_miner_block(miner_address rpc.Address) (cbl 
 	}
 
 	if mbls := chain.MiniBlocks.GetAllMiniBlocks(key); len(mbls) > 0 {
-		//TODO: here get miner addresses
-		if uint64(len(mbls)) > config.BLOCK_TIME-config.MINIBLOCK_HIGHDIFF {
-			//this picks the 9 miniblocks?
-			mbls = mbls[:config.BLOCK_TIME-config.MINIBLOCK_HIGHDIFF]
+		my_blocks := globals.My_Blocks
+		selected := []block.MiniBlock{}
+		not_selected := []block.MiniBlock{}
+		for _, mbl := range mbls {
+			match := true
+			for idx, key_byte := range mbl.KeyHash {
+				for _, myblock := range my_blocks {
+					if myblock.KeyHash[idx] != key_byte {
+						match = false
+						break
+					}
+				}
+				if match {
+					selected = append(selected, mbl)
+				} else {
+					not_selected = append(not_selected, mbl)
+				}
+			}
 		}
+		missing := 9 - len(selected)
+		if missing > 0 {
+			selected = append(selected, not_selected[:missing]...)
+		}
+		mbls = selected
+		//		if uint64(len(mbls)) > config.BLOCK_TIME-config.MINIBLOCK_HIGHDIFF {
+		//			//this picks the 9 miniblocks?
+		//			mbls = mbls[:config.BLOCK_TIME-config.MINIBLOCK_HIGHDIFF]
+		//		}
 		bl.MiniBlocks = mbls
 	}
 
@@ -504,6 +527,11 @@ func (chain *Blockchain) Accept_new_block(tstamp uint64, miniblock_blob []byte) 
 		}
 
 		if err1, ok := chain.InsertMiniBlock(mbl); ok {
+			if globals.My_Blocks_Height != chain.Get_Height() {
+				globals.My_Blocks = []block.MiniBlock{}
+				globals.My_Blocks_Height = chain.Get_Height()
+			}
+			globals.My_Blocks = append(globals.My_Blocks, mbl)
 			result = true
 
 			// notify peers, we have a miniblock and return to miner

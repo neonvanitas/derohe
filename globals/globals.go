@@ -16,7 +16,10 @@
 
 package globals
 
-import "io"
+import (
+	"github.com/deroproject/derohe/block"
+	"io"
+)
 import "os"
 import "fmt"
 import "time"
@@ -65,6 +68,8 @@ var Minis_Forwarded map[uint64][]string
 var Block_Forward_Height int64
 var Minis_Forward_Height int64
 var Latency_Height int64
+var My_Blocks []block.MiniBlock
+var My_Blocks_Height int64
 
 // get current time with clock offset applied
 func Time() time.Time {
@@ -200,6 +205,7 @@ func Initialize() {
 
 	Blocks_Forwarded = map[uint64][]string{}
 	Minis_Forwarded = map[uint64][]string{}
+	My_Blocks = []block.MiniBlock{}
 	// choose  socks based proxy if user requested so
 	if Arguments["--socks-proxy"] != nil {
 		Logger.V(1).Info("Setting up proxy using ", "address", Arguments["--socks-proxy"].(string))
