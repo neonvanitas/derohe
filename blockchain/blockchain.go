@@ -1154,8 +1154,8 @@ func (chain *Blockchain) Write_Block_Minis(bl *block.Block) {
 	line := fmt.Sprintf("%d,%t,%s,%d,%s,%d,%d\n",
 		chain.Get_Height(), true, coinbase, now_unix, now_human, minis, block_time_diff)
 
-	chain.Log_lock.Lock()
-	defer chain.Log_lock.Unlock()
+	//	chain.Log_lock.Lock()
+	//	defer chain.Log_lock.Unlock()
 
 	filename := "received_blocks.csv"
 	//try to open file before writing into it. if it does not exist, later write header as first line
