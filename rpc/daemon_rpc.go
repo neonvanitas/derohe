@@ -118,6 +118,7 @@ type (
 		EpochMilli         uint64 `json:"epochmilli"`
 		Blocks             uint64 `json:"blocks"`     // number of blocks found
 		MiniBlocks         uint64 `json:"miniblocks"` // number of miniblocks found
+		Rejected           uint64 `json:"rejected"`   // reject count
 		LastError          string `json:"lasterror"`  // last error
 		Status             string `json:"status"`
 	}
