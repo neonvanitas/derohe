@@ -536,16 +536,20 @@ func (chain *Blockchain) Accept_new_block(tstamp uint64, miniblock_blob []byte) 
 		}
 
 		if err1, ok := chain.InsertMiniBlock(mbl); ok {
-			fmt.Printf("inserting miniblock at: %d, %d\n", chain.Get_Height(), globals.My_Blocks_Height)
-			fmt.Printf("appending to own miniblock store\n")
-			globals.My_Blocks = append(globals.My_Blocks, mbl)
-			result = true
+			//			fmt.Printf("attempting to insert miniblock at height %d, chain already at %d and %d\n", mbl.Height, chain.Get_Height(), globals.My_Blocks_Height)
+			if mbl.Height != uint64(globals.My_Blocks_Height)+1 {
+				fmt.Printf("attempting to insert miniblock at height %d, chain already at %d and %d", mbl.Height, chain.Get_Height(), globals.My_Blocks_Height)
+			} else {
+				fmt.Printf("inserting miniblock at: %d, %d\n", chain.Get_Height(), globals.My_Blocks_Height)
+				fmt.Printf("appending to own miniblock store\n")
+				globals.My_Blocks = append(globals.My_Blocks, mbl)
+				result = true
 
-			// notify peers, we have a miniblock and return to miner
-			if !chain.simulator { // if not in simulator mode, relay miniblock to the chain
-				go chain.P2P_MiniBlock_Relayer(mbl, 0)
+				// notify peers, we have a miniblock and return to miner
+				if !chain.simulator { // if not in simulator mode, relay miniblock to the chain
+					go chain.P2P_MiniBlock_Relayer(mbl, 0)
+				}
 			}
-
 		} else {
 			logger.V(1).Error(err1, "miniblock insertion failed", "mbl", fmt.Sprintf("%+v", mbl))
 			err = err1
