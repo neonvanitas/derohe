@@ -18,6 +18,7 @@ package blockchain
 
 import (
 	"fmt"
+	"github.com/deroproject/derohe/globals"
 	"github.com/deroproject/derohe/rpc"
 	"io/ioutil"
 	"log"
@@ -126,6 +127,12 @@ func Verify_MiniBlocks(bl block.Block) (err error) {
 
 // insert a miniblock to chain and if successfull inserted, notify everyone in need
 func (chain *Blockchain) InsertMiniBlock(mbl block.MiniBlock) (err error, result bool) {
+	if globals.My_Blocks_Height != chain.Get_Height() {
+		fmt.Printf("switching miniblock store to new array\n")
+		globals.My_Blocks = []block.MiniBlock{}
+		globals.My_Blocks_Height = chain.Get_Height()
+	}
+
 	var miner_hash crypto.Hash
 	copy(miner_hash[:], mbl.KeyHash[:])
 	if !chain.IsAddressHashValid(true, miner_hash) {

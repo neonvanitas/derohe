@@ -18,6 +18,7 @@ package globals
 
 import (
 	"github.com/deroproject/derohe/block"
+	"github.com/deroproject/derohe/myglobals"
 	"io"
 )
 import "os"
@@ -115,9 +116,11 @@ var Dialer proxy.Dialer = proxy.Direct // for proxy and direct connections
 var Arguments = map[string]interface{}{}
 
 func InitNetwork() {
-	Config = config.Mainnet                    // default is mainnnet
+	Config = config.Mainnet // default is mainnnet
+	myglobals.Is_Mainnet = true
 	if Arguments["--testnet"].(bool) == true { // setup testnet if requested
 		Config = config.Testnet
+		myglobals.Is_Mainnet = false
 	}
 
 }
