@@ -17,35 +17,32 @@
 package blockchain
 
 import (
+	"bytes"
+	"encoding/binary"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
+	"runtime/debug"
+	"sort"
 	"strconv"
+	"sync"
 	"time"
-)
-import "bytes"
-import "sort"
-import "sync"
-import "runtime/debug"
-import "encoding/binary"
 
-import "golang.org/x/xerrors"
-import "golang.org/x/time/rate"
-import "golang.org/x/crypto/sha3"
+	"github.com/deroproject/derohe/block"
+	"github.com/deroproject/derohe/config"
+	"github.com/deroproject/derohe/cryptography/crypto"
+	"github.com/deroproject/derohe/errormsg"
+	"github.com/deroproject/derohe/globals"
+	"github.com/deroproject/derohe/rpc"
+	"github.com/deroproject/derohe/transaction"
+	"github.com/deroproject/graviton"
+	"golang.org/x/crypto/sha3"
+	"golang.org/x/time/rate"
+	"golang.org/x/xerrors"
+)
 
 // this file creates the blobs which can be used to mine new blocks
-
-import "github.com/deroproject/derohe/block"
-import "github.com/deroproject/derohe/config"
-import "github.com/deroproject/derohe/cryptography/crypto"
-import "github.com/deroproject/derohe/globals"
-import "github.com/deroproject/derohe/rpc"
-
-import "github.com/deroproject/derohe/errormsg"
-import "github.com/deroproject/derohe/transaction"
-
-import "github.com/deroproject/graviton"
 
 const TX_VALIDITY_HEIGHT = 11
 
@@ -55,6 +52,8 @@ type BlockScore struct {
 	//MiniCount int
 	Height int64 // block height
 }
+
+var set_final uint8
 
 // Heighest height is ordered first,  the condition is reverted see eg. at https://golang.org/pkg/sort/#Slice
 //  if heights are equal, nodes are sorted by their block ids which will never collide , hopefullly
@@ -401,16 +400,33 @@ func ConvertBlockToMiniblock(bl block.Block, miniblock_miner_address rpc.Address
 		mbl.Past[i] = binary.BigEndian.Uint32(bl.Tips[i][:])
 	}
 
-	if uint64(len(bl.MiniBlocks)) < config.BLOCK_TIME-config.MINIBLOCK_HIGHDIFF {
-		miner_address_hashed_key := graviton.Sum(miniblock_miner_address.Compressed())
-		copy(mbl.KeyHash[:], miner_address_hashed_key[:])
-	} else {
-		mbl.Final = true
-		mbl.HighDiff = true
-		block_header_hash := sha3.Sum256(bl.Serialize()) // note here this block is not present
-		for i := range mbl.KeyHash {
-			mbl.KeyHash[i] = block_header_hash[i]
+	if set_final%3 != 0 {
+		if uint64(len(bl.MiniBlocks)) < config.BLOCK_TIME-config.MINIBLOCK_HIGHDIFF {
+			miner_address_hashed_key := graviton.Sum(miniblock_miner_address.Compressed())
+			copy(mbl.KeyHash[:], miner_address_hashed_key[:])
+		} else {
+			mbl.Final = true
+			mbl.HighDiff = true
+			block_header_hash := sha3.Sum256(bl.Serialize()) // note here this block is not present
+			for i := range mbl.KeyHash {
+				mbl.KeyHash[i] = block_header_hash[i]
+			}
 		}
+		set_final++
+	} else {
+		// give the chance to add up to 9 additional miniblocks while mbl.Final is set
+		if uint64(len(bl.MiniBlocks)) < config.BLOCK_TIME {
+			miner_address_hashed_key := graviton.Sum(miniblock_miner_address.Compressed())
+			copy(mbl.KeyHash[:], miner_address_hashed_key[:])
+		} else {
+			mbl.Final = true
+			mbl.HighDiff = true
+			block_header_hash := sha3.Sum256(bl.Serialize()) // note here this block is not present
+			for i := range mbl.KeyHash {
+				mbl.KeyHash[i] = block_header_hash[i]
+			}
+		}
+		set_final++
 	}
 	// leave the flags for users as per their request
 
