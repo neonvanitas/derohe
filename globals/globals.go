@@ -71,6 +71,7 @@ var Minis_Forward_Height int64
 var Latency_Height int64
 var My_Blocks []block.MiniBlock
 var My_Blocks_Height int64
+var MiniBlockExtraFrequency uint8
 
 // get current time with clock offset applied
 func Time() time.Time {
@@ -223,6 +224,17 @@ func Initialize() {
 		if err != nil {
 			Logger.Error(err, "Error creating socks proxy", "address", Arguments["--socks-proxy"].(string))
 		}
+	}
+	if Arguments["--extra-mini-freq"] != nil {
+		freq, err := strconv.Atoi(Arguments["--extra-mini-freq"].(string))
+		if err != nil {
+			Logger.Error(err, "Error parsing extra mini frequency:")
+			os.Exit(-1)
+		}
+		Logger.V(1).Info("Setting up extra mini frequency ", "freq", freq)
+		MiniBlockExtraFrequency = uint8(freq)
+	} else {
+		MiniBlockExtraFrequency = 0
 	}
 
 	// lets create data directories

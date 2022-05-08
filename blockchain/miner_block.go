@@ -400,7 +400,7 @@ func ConvertBlockToMiniblock(bl block.Block, miniblock_miner_address rpc.Address
 		mbl.Past[i] = binary.BigEndian.Uint32(bl.Tips[i][:])
 	}
 
-	if set_final%3 != 0 {
+	if globals.MiniBlockExtraFrequency > 0 && set_final%globals.MiniBlockExtraFrequency != 0 {
 		if uint64(len(bl.MiniBlocks)) < config.BLOCK_TIME-config.MINIBLOCK_HIGHDIFF {
 			miner_address_hashed_key := graviton.Sum(miniblock_miner_address.Compressed())
 			copy(mbl.KeyHash[:], miner_address_hashed_key[:])
