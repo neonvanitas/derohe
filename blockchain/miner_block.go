@@ -368,7 +368,7 @@ func (chain *Blockchain) Create_new_miner_block(miner_address rpc.Address) (cbl 
 		if len(selected) >= 9 {
 			selected = selected[:9]
 		}
-		fmt.Printf("found minis vs not found minis %d vs %d vs %d\n", found, missing, len(selected))
+		//fmt.Printf("found minis vs not found minis %d vs %d vs %d\n", found, missing, len(selected))
 		mbls = selected
 		//		if uint64(len(mbls)) > config.BLOCK_TIME-config.MINIBLOCK_HIGHDIFF {
 		//			//this picks the 9 miniblocks?

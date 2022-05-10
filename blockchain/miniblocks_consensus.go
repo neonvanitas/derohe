@@ -213,7 +213,7 @@ func (chain *Blockchain) WriteReceivedMinisToFile(mbl block.MiniBlock) {
 	if len(keys) > 0 {
 		minis = len(chain.MiniBlocks.GetAllMiniBlocks(keys[0]))
 	}
-	fmt.Printf("miniblock inserted successfully for miner %s, height %d, total %d\n", addr, mbl.Height, minis)
+	//fmt.Printf("miniblock inserted successfully for miner %s, height %d, total %d\n", addr, mbl.Height, minis)
 
 	line := fmt.Sprintf("%d,%t,%s,%d,%s,%d,%d\n",
 		mbl.Height, mbl.Final, coinbase, now_unix, now_human, minis, block_time_diff)
