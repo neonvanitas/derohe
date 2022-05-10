@@ -17,24 +17,22 @@
 package blockchain
 
 import (
+	"encoding/binary"
 	"fmt"
-	"github.com/deroproject/derohe/globals"
-	"github.com/deroproject/derohe/rpc"
 	"io/ioutil"
 	"log"
 	"os"
 	"time"
+
+	"github.com/deroproject/derohe/block"
+	"github.com/deroproject/derohe/config"
+	"github.com/deroproject/derohe/cryptography/crypto"
+	"github.com/deroproject/derohe/globals"
+	"github.com/deroproject/derohe/rpc"
+	"golang.org/x/crypto/sha3"
 )
 
 //import "time"
-
-import "encoding/binary"
-
-import "github.com/deroproject/derohe/block"
-import "github.com/deroproject/derohe/config"
-import "github.com/deroproject/derohe/cryptography/crypto"
-
-import "golang.org/x/crypto/sha3"
 
 // last miniblock must be extra checked for corruption/attacks
 func (chain *Blockchain) Verify_MiniBlocks_HashCheck(cbl *block.Complete_Block) (err error) {
@@ -220,4 +218,16 @@ func (chain *Blockchain) WriteReceivedMinisToFile(mbl block.MiniBlock) {
 	if _, err := f.Write([]byte(line)); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func clean_my_blocks(past0 uint32, past1 uint32) {
+	var sorted []block.MiniBlock
+	my_mbls_copy := globals.My_Blocks
+
+	for i := range my_mbls_copy {
+		if my_mbls_copy[i].Past[0] == past0 && my_mbls_copy[i].Past[1] == past1 {
+			sorted = append(sorted, my_mbls_copy[i])
+		}
+	}
+	globals.My_Blocks = sorted
 }
