@@ -126,7 +126,7 @@ func Verify_MiniBlocks(bl block.Block) (err error) {
 // insert a miniblock to chain and if successfull inserted, notify everyone in need
 func (chain *Blockchain) InsertMiniBlock(mbl block.MiniBlock) (err error, result bool) {
 	if globals.My_Blocks_Height != chain.Get_Height() {
-		fmt.Printf("switching miniblock store to new array\n")
+		//fmt.Printf("switching miniblock store to new array\n")
 		globals.My_Blocks = []block.MiniBlock{}
 		globals.My_Blocks_Height = chain.Get_Height()
 	}
