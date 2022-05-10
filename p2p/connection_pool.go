@@ -421,7 +421,7 @@ func broadcast_Block_Coded(cbl *block.Complete_Block, PeerID uint64, first_seen 
 		logger.Info(" WOOHOO - We mined a block ")
 		//globals.Blocks_Mined++
 	} else {
-		logger.Info(fmt.Sprintf("Forwarding block (%d) from PeerID (%d)", hex.EncodeToString(blid[:]), PeerID))
+		//logger.Info(fmt.Sprintf("Forwarding block (%s) from PeerID (%d)", hex.EncodeToString(blid[:]), PeerID))
 		globals.Blocks_Forwarded[PeerID] = append(globals.Blocks_Forwarded[PeerID], hex.EncodeToString(blid[:]))
 		chain_height := chain.Get_Height()
 		if chain_height > globals.Block_Forward_Height {
