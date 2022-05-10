@@ -336,6 +336,8 @@ func (chain *Blockchain) Create_new_miner_block(miner_address rpc.Address) (cbl 
 		key.Past1 = binary.BigEndian.Uint32(bl.Tips[1][:])
 	}
 
+	clean_my_blocks(key.Past0, key.Past1)
+
 	if mbls := chain.MiniBlocks.GetAllMiniBlocks(key); len(mbls) > 0 {
 		//fmt.Printf("building block template from minis\n")
 		my_blocks := globals.My_Blocks
