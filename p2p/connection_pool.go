@@ -653,10 +653,10 @@ func broadcast_MiniBlock(mbl block.MiniBlock, PeerID uint64, first_seen int64) {
 	unique_map := UniqueConnections()
 
 	if PeerID == GetPeerID() || PeerID == 0 {
-		logger.Info(" WOOHOO - We mined a miniblock ")
+		//logger.Info(" WOOHOO - We mined a miniblock ")
 		//globals.Blocks_Mined++
 	} else {
-		logger.Info(fmt.Sprintf("Forwarding miniblock (%s) from PeerID (%d)", hex.EncodeToString(mbl.KeyHash[:16]), PeerID))
+		//logger.Info(fmt.Sprintf("Forwarding miniblock (%s) from PeerID (%d)", hex.EncodeToString(mbl.KeyHash[:16]), PeerID))
 		globals.Minis_Forwarded[PeerID] = append(globals.Minis_Forwarded[PeerID], hex.EncodeToString(mbl.KeyHash[:16]))
 		if our_height > globals.Minis_Forward_Height {
 			for peer_id, block_ids := range globals.Minis_Forwarded {

@@ -25,7 +25,6 @@ import (
 	"os"
 	"runtime/debug"
 	"sort"
-	"strconv"
 	"sync"
 	"time"
 
@@ -338,7 +337,7 @@ func (chain *Blockchain) Create_new_miner_block(miner_address rpc.Address) (cbl 
 	}
 
 	if mbls := chain.MiniBlocks.GetAllMiniBlocks(key); len(mbls) > 0 {
-		fmt.Printf("building block template from minis\n")
+		//fmt.Printf("building block template from minis\n")
 		my_blocks := globals.My_Blocks
 		selected := []block.MiniBlock{}
 		not_selected := []block.MiniBlock{}
@@ -665,10 +664,10 @@ func (chain *Blockchain) Accept_new_block(tstamp uint64, miniblock_blob []byte) 
 		panic(err2)
 	}
 
-	for idx, mbl := range mini_blocks {
+	for _, mbl := range mini_blocks {
 		_, key_compressed, _, err2 := balance_tree.GetKeyValueFromHash(mbl.KeyHash[:16])
 		if err2 != nil { // the full block does not have the hashkey based coinbase
-			fmt.Println("miner final: miniblock has no hashkey: " + strconv.Itoa(idx))
+			//fmt.Println("miner final: miniblock has no hashkey: " + strconv.Itoa(idx))
 			continue
 		}
 		//record_version, _ := chain.ReadBlockSnapshotVersion(bl.Tips[0])

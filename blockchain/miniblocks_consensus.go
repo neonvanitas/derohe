@@ -149,7 +149,7 @@ func (chain *Blockchain) InsertMiniBlock(mbl block.MiniBlock) (err error, result
 
 		chain.flip_top()
 	} else {
-		fmt.Printf("error inserting miniblock to chain %s\n", err)
+		//fmt.Printf("error inserting miniblock to chain %s\n", err)
 	}
 	return err, result
 }

@@ -18,10 +18,8 @@ package rpc
 
 //import "fmt"
 import (
-	"fmt"
 	"github.com/deroproject/derohe/config"
 	"github.com/deroproject/derohe/cryptography/crypto"
-	"strconv"
 )
 import "github.com/deroproject/derohe/rpc"
 import "github.com/deroproject/derohe/blockchain"
@@ -53,7 +51,7 @@ func GetBlockHeader(chain *blockchain.Blockchain, hash crypto.Hash) (result rpc.
 	result.Reward = blockchain.CalcBlockReward(uint64(result.Height))
 	result.TXCount = int64(len(bl.Tx_hashes))
 
-	for idx, mbl := range bl.MiniBlocks {
+	for _, mbl := range bl.MiniBlocks {
 		//fmt.Println("processing miniblock:" + strconv.Itoa(idx))
 		//var ss *graviton.Snapshot
 		max_topo := chain.Load_TOPO_HEIGHT()
@@ -69,7 +67,7 @@ func GetBlockHeader(chain *blockchain.Blockchain, hash crypto.Hash) (result rpc.
 		}
 		_, key_compressed, _, err2 := balance_tree.GetKeyValueFromHash(mbl.KeyHash[:16])
 		if err2 != nil { // the full block does not have the hashkey based coinbase
-			fmt.Println("miniblock has no hashkey: " + strconv.Itoa(idx))
+			//fmt.Println("miniblock has no hashkey: " + strconv.Itoa(idx))
 			continue
 		}
 
