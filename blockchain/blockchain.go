@@ -390,6 +390,14 @@ func (chain *Blockchain) Add_Complete_Block(cbl *block.Complete_Block) (err erro
 
 	bl := cbl.Bl // small pointer to block
 
+	poolHeight := chain.Get_Height()
+	var poolMinis []block.MiniBlock
+	for k, _ := range chain.MiniBlocks.Collection {
+		if k.Height == uint64(poolHeight) {
+			poolMinis = chain.MiniBlocks.Collection[k]
+		}
+	}
+
 	block_hash = bl.GetHash()
 
 	block_logger := logger.WithName(fmt.Sprintf("blid_%s", block_hash)).V(1)
@@ -1121,7 +1129,7 @@ func (chain *Blockchain) Add_Complete_Block(cbl *block.Complete_Block) (err erro
 		chain.Write_Purge_Count(chain.Get_Height(), chain.Get_Stable_Height(), purged_key_count, purged_mini_count, chain.MiniBlocks.Count(), lost_mini_count)
 		chain.Write_Lost_Mini(chain.Get_Height(), lost_minis)
 		chain.Write_Block_Minis(bl)
-		//	chain.Write_Mini_Blocks(chain.Get_Height(), chain.MiniBlocks)
+		chain.Write_Mini_Block_Pool(poolHeight, poolMinis)
 	}
 
 	result = true
@@ -1209,7 +1217,7 @@ func (chain *Blockchain) Write_Minis_To_File(filename string, block_idx int64, l
 		}
 	}()
 	if err != nil {
-		if _, err := f.Write([]byte("chain_height,coinbase_address,version,chain_height,final,highdiff,timestamp,flags,past0,past1,nonce0,nonce1,nonce2\n")); err != nil {
+		if _, err := f.Write([]byte("chain_height,coinbase_address,version,chain_height,final,highdiff,timestamp,flags,past0,past1,nonce0,nonce1,nonce2,hash\n")); err != nil {
 			log.Fatal(err)
 		}
 	}
@@ -1225,14 +1233,8 @@ func (chain *Blockchain) Write_Lost_Mini(block_idx int64, lost_minis []block.Min
 	chain.Write_Minis_To_File("lost_minis.csv", block_idx, lost_minis)
 }
 
-func (chain *Blockchain) Write_Mini_Blocks(block_idx int64, minis *block.MiniBlocksCollection) {
-	minis.RLock()
-	defer minis.RUnlock()
-
-	for _, miniKey := range minis.Collection {
-		//TODO: look into reusing file and not opening all the time
-		chain.Write_Minis_To_File("mini_pool.csv", block_idx, miniKey)
-	}
+func (chain *Blockchain) Write_Mini_Block_Pool(block_idx int64, minis []block.MiniBlock) {
+	chain.Write_Minis_To_File("mini_pool.csv", block_idx, minis)
 }
 
 func (chain *Blockchain) MiniBlockCoinbase(mbl block.MiniBlock, chain_height int64) string {
@@ -1275,9 +1277,9 @@ func (chain *Blockchain) MiniBlockString(mbl block.MiniBlock, chain_height int64
 	coinbase := chain.MiniBlockCoinbase(mbl, chain_height)
 	//fmt.Println("Coinbase addr: " + coinbase)
 
-	line := fmt.Sprintf("%d,%s,%d,%d,%t,%t,%d,%d,%08x,%08x,%08x,%08x,%08x\n",
+	line := fmt.Sprintf("%d,%s,%d,%d,%t,%t,%d,%d,%08x,%08x,%08x,%08x,%08x,%s\n",
 		chain_height, coinbase, mbl.Version, mbl.Height, mbl.Final, mbl.HighDiff, mbl.Timestamp, mbl.Flags,
-		mbl.Past[0], mbl.Past[1], mbl.Nonce[0], mbl.Nonce[1], mbl.Nonce[2])
+		mbl.Past[0], mbl.Past[1], mbl.Nonce[0], mbl.Nonce[1], mbl.Nonce[2], mbl.GetHash().String())
 	return line
 }
 

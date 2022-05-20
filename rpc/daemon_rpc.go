@@ -22,24 +22,41 @@ import "github.com/deroproject/derohe/cryptography/crypto"
 
 // this is used to print blockheader for the rpc and the daemon
 type BlockHeader_Print struct {
-	Depth         int64    `json:"depth"`
-	Difficulty    string   `json:"difficulty"`
-	Hash          string   `json:"hash"`
-	Height        int64    `json:"height"`
-	TopoHeight    int64    `json:"topoheight"`
-	Major_Version uint64   `json:"major_version"`
-	Minor_Version uint64   `json:"minor_version"`
-	Nonce         uint64   `json:"nonce"`
-	Orphan_Status bool     `json:"orphan_status"`
-	SyncBlock     bool     `json:"syncblock"`
-	SideBlock     bool     `json:"sideblock"`
-	TXCount       int64    `json:"txcount"`
-	Coinbase      string   `json:"coinbase"`
-	MiniCoinbases []string `json:"mini_coinbases"`
+	Depth         int64            `json:"depth"`
+	Difficulty    string           `json:"difficulty"`
+	Hash          string           `json:"hash"`
+	Height        int64            `json:"height"`
+	TopoHeight    int64            `json:"topoheight"`
+	Major_Version uint64           `json:"major_version"`
+	Minor_Version uint64           `json:"minor_version"`
+	Nonce         uint64           `json:"nonce"`
+	Orphan_Status bool             `json:"orphan_status"`
+	SyncBlock     bool             `json:"syncblock"`
+	SideBlock     bool             `json:"sideblock"`
+	TXCount       int64            `json:"txcount"`
+	Coinbase      string           `json:"coinbase"`
+	Minis         []MiniBlock_Info `json:"minis"`
 
 	Reward    uint64   `json:"reward"`
 	Tips      []string `json:"tips"`
 	Timestamp uint64   `json:"timestamp"`
+}
+
+type MiniBlock_Info struct {
+	Height    int64  `json:"depth"`
+	Hash      string `json:"hash"`
+	Version   uint64 `json:"version"`
+	Nonce1    string `json:"nonce1"`
+	Nonce2    string `json:"nonce2"`
+	Nonce3    string `json:"nonce3"`
+	Coinbase  string `json:"coinbase"`
+	Pow       string `json:"pow"`
+	Past1     string `json:"past1"`
+	Past2     string `json:"past2"`
+	HighDiff  bool   `json:"high"`
+	Final     bool   `json:"final"`
+	Flags     uint32 `json:"flags"`
+	Timestamp uint16 `json:"timestamp"`
 }
 
 type (

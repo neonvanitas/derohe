@@ -18,6 +18,7 @@ package rpc
 
 //import "fmt"
 import (
+	"fmt"
 	"github.com/deroproject/derohe/config"
 	"github.com/deroproject/derohe/cryptography/crypto"
 )
@@ -52,6 +53,17 @@ func GetBlockHeader(chain *blockchain.Blockchain, hash crypto.Hash) (result rpc.
 	result.TXCount = int64(len(bl.Tx_hashes))
 
 	for _, mbl := range bl.MiniBlocks {
+		mbl_hash := mbl.GetHash().String()
+		mbl_time := mbl.Timestamp
+		mbl_pow := mbl.GetPoWHash().String()
+		mbl_final := mbl.Final
+		mbl_highdiff := mbl.HighDiff
+		mbl_past1 := fmt.Sprintf("%08x", mbl.Past[0])
+		mbl_past2 := fmt.Sprintf("%08x", mbl.Past[1])
+		mbl_flags := mbl.Flags
+		mbl_nonce1 := fmt.Sprintf("%08x", mbl.Nonce[0])
+		mbl_nonce2 := fmt.Sprintf("%08x", mbl.Nonce[1])
+		mbl_nonce3 := fmt.Sprintf("%08x", mbl.Nonce[2])
 		//fmt.Println("processing miniblock:" + strconv.Itoa(idx))
 		//var ss *graviton.Snapshot
 		max_topo := chain.Load_TOPO_HEIGHT()
@@ -76,7 +88,22 @@ func GetBlockHeader(chain *blockchain.Blockchain, hash crypto.Hash) (result rpc.
 
 		//		mbl_coinbase, _ := chain.KeyHashConverToAddress(key_compressed, record_version)
 		addr := mbl_coinbase.String()
-		result.MiniCoinbases = append(result.MiniCoinbases, addr)
+		mini := rpc.MiniBlock_Info{
+			Coinbase:  addr,
+			Height:    result.Height,
+			Hash:      mbl_hash,
+			Nonce1:    mbl_nonce1,
+			Nonce2:    mbl_nonce2,
+			Nonce3:    mbl_nonce3,
+			Pow:       mbl_pow,
+			HighDiff:  mbl_highdiff,
+			Final:     mbl_final,
+			Timestamp: mbl_time,
+			Past1:     mbl_past1,
+			Past2:     mbl_past2,
+			Flags:     mbl_flags,
+		}
+		result.Minis = append(result.Minis, mini)
 		//fmt.Println("Coinbase addr: " + addr)
 		//record_version, _ := chain.ReadBlockSnapshotVersion(bl.Tips[0])
 		//mbl_coinbase, _ := chain.KeyHashConverToAddress(mbl.KeyHash, record_version)
