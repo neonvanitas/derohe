@@ -19,7 +19,6 @@ package rpc
 //import "fmt"
 import (
 	"fmt"
-	"github.com/deroproject/derohe/config"
 	"github.com/deroproject/derohe/cryptography/crypto"
 )
 import "github.com/deroproject/derohe/rpc"
