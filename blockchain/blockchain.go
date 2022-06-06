@@ -280,7 +280,7 @@ try_again:
 	atomic.AddUint32(&globals.Subsystem_Active, 1) // increment subsystem
 
 	globals.Cron.AddFunc("@every 360s", clean_up_valid_cache) // cleanup valid tx cache
-	globals.Cron.AddFunc("@every 60s", func() {               // mempool house keeping
+	globals.Cron.AddFunc("@every 60s", func() { // mempool house keeping
 
 		stable_height := int64(0)
 		if r := recover(); r != nil {
@@ -491,8 +491,6 @@ func (chain *Blockchain) Add_Complete_Block(cbl *block.Complete_Block) (err erro
 		}
 	}
 
-	
-
 	if bl.Height > uint64(chain.Get_Height()+2) {
 		return fmt.Errorf("advance Block"), false // block in future skipping it
 	}
@@ -627,7 +625,7 @@ func (chain *Blockchain) Add_Complete_Block(cbl *block.Complete_Block) (err erro
 		}
 	}
 
-	{ // miner TX checks are here
+	{                                                   // miner TX checks are here
 		if bl.Height == 0 && !bl.Miner_TX.IsPremine() { // genesis block contain premine tx a
 			fmt.Printf("genesis tx error\n")
 			block_logger.Error(fmt.Errorf("Miner tx failed verification for genesis"), "rejecting")
@@ -1312,13 +1310,15 @@ func (chain *Blockchain) Write_Purge_Count(block_idx int64, stable_idx int64, pu
 		}
 	}()
 	if err != nil {
-		if _, err := f.Write([]byte("stable_height,chain_height,purge_count,purged_mini_count,lost_minis,minipool_count\n")); err != nil {
+		if _, err := f.Write([]byte("stable_height,chain_height,purge_count,purged_mini_count,lost_minis,minipool_count,hashrate(diff)\n")); err != nil {
 			log.Fatal(err)
 		}
 	}
 	//	fmt.Println(string(content)) // This is some content
 
-	line := fmt.Sprintf("%d,%d,%d,%d,%d,%d\n", stable_idx, block_idx, purged_key_count, purged_mini_count, lost_mini_count, minipool_count)
+	hashrate := chain.Get_Network_HashRate() //it is the same as difficulty
+
+	line := fmt.Sprintf("%d,%d,%d,%d,%d,%d,%d\n", stable_idx, block_idx, purged_key_count, purged_mini_count, lost_mini_count, minipool_count, hashrate)
 	if _, err := f.Write([]byte(line)); err != nil {
 		log.Fatal(err)
 	}
