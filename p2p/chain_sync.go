@@ -51,7 +51,7 @@ func (x *MemorySource) insert_block(cbl *block.Complete_Block) {
 	blid := cbl.Bl.GetHash()
 
 	for _, mbl := range cbl.Bl.MiniBlocks {
-		PoW := mbl.GetPoWHash()
+		PoW := mbl.GetPoWHash(globals.Config)
 		if blockchain.CheckPowHashBig(PoW, diff) == false {
 			panic("pow failed")
 		}

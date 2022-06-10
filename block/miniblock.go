@@ -28,7 +28,9 @@ import "golang.org/x/crypto/sha3"
 import "github.com/deroproject/derohe/cryptography/crypto"
 import "github.com/deroproject/derohe/astrobwt"
 import "github.com/deroproject/derohe/astrobwt/astrobwtv3"
-import "github.com/deroproject/derohe/globals"
+import "github.com/deroproject/derohe/config"
+
+//import "github.com/deroproject/derohe/globals"
 
 const MINIBLOCK_SIZE = 48
 
@@ -110,8 +112,8 @@ func (mbl *MiniBlock) GetHash() (result crypto.Hash) {
 }
 
 // Get PoW hash , this is very slow function
-func (mbl *MiniBlock) GetPoWHash() (hash crypto.Hash) {
-	if mbl.Height < uint64(globals.Config.MAJOR_HF2_HEIGHT) {
+func (mbl *MiniBlock) GetPoWHash(Config config.CHAIN_CONFIG) (hash crypto.Hash) {
+	if mbl.Height < uint64(Config.MAJOR_HF2_HEIGHT) {
 		return astrobwt.POW16(mbl.Serialize())
 	}
 	return astrobwtv3.AstroBWTv3(mbl.Serialize())

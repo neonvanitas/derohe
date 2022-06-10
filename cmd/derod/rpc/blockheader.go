@@ -56,7 +56,7 @@ func GetBlockHeader(chain *blockchain.Blockchain, hash crypto.Hash) (result rpc.
 	for _, mbl := range bl.MiniBlocks {
 		mbl_hash := mbl.GetHash().String()
 		mbl_time := mbl.Timestamp
-		mbl_pow := mbl.GetPoWHash().String()
+		mbl_pow := mbl.GetPoWHash(globals.Config).String()
 		mbl_final := mbl.Final
 		mbl_highdiff := mbl.HighDiff
 		mbl_past1 := fmt.Sprintf("%08x", mbl.Past[0])

@@ -161,7 +161,7 @@ func (chain *Blockchain) VerifyMiniblockPoW(bl *block.Block, mbl block.MiniBlock
 		return true
 	}
 
-	PoW := mbl.GetPoWHash()
+	PoW := mbl.GetPoWHash(globals.Config)
 	block_difficulty := chain.Get_Difficulty_At_Tips(bl.Tips)
 
 	// test new difficulty checksm whether they are equivalent to integer math
